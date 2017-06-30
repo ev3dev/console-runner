@@ -1,0 +1,21 @@
+Source: console-runner
+Priority: optional
+Maintainer: David Lechner <david@lechnology.com>
+Build-Depends: debhelper (>= 10),
+    cmake (>= 3),
+    libglib2.0-dev,
+    pandoc,
+    pkg-config,
+    valac
+Standards-Version: 3.9.8
+Section: utils
+Homepage: https://github.com/ev3dev/console-runner
+Vcs-Git: https://github.com/ev3dev/console-runner.git
+Vcs-Browser: https://github.com/ev3dev/console-runner
+
+Package: console-runner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: D-Bus client/server for running programs on a remote virtual console
+ This tool is helpful for running programs that require a virtual terminal/
+ console from a remote connection, such as a SSH shell.
