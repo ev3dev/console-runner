@@ -98,7 +98,7 @@ Here is an example::
     <busconfig>
         <policy user="myname">
             <allow own="org.ev3dev.ConsoleRunner"/>
-            <allow send_type="method_call" log="true"/>
+            <allow send_type="method_call"/>
         </policy>
     </busconfig>
 
