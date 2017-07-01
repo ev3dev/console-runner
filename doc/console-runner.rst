@@ -32,7 +32,7 @@ terminal. Then commands can be sent from anywhere (locally, via D-Bus) and run
 on a virtual terminal. This is mostly useful for starting graphics programs
 that require a virtual terminal rather than running in a desktop environment.
 
-**Note:**: **console-runner** requires some manual configuration before the
+**Note:** **console-runner** requires some manual configuration before the
 first use. See the `D-BUS`_ section below.
 
 
@@ -102,8 +102,8 @@ Here is an example::
         </policy>                 
     </busconfig>
 
-Replace `myname` with your user name and save the file as
-`/etc/dbus-1/system.d/org.ev3dev.grx.ConsoleRunner.conf`. Then you will be
+Replace ``myname`` with your user name and save the file as
+``/etc/dbus-1/system.d/org.ev3dev.grx.ConsoleRunner.conf``. Then you will be
 able to use **console-runner** with your user account.
 
 
@@ -128,12 +128,12 @@ and run **conrun-server** using your user account::
     [Install]
     WantedBy=multi-user.target
 
-Replace `myname` with your user name and save this as
-`/etc/systemd/system/console-run@.service`. Then, as root, run::
+Replace ``myname`` with your user name and save this as
+``/etc/systemd/system/console-run@.service``. Then, as root, run::
 
     systemctl daemon-reload
     systemctl enable console-run@tty5.service
     systemctl start console-run@tty5.service
 
-This will start **conrun-server** on `tty5` and also make is so that it starts
+This will start **conrun-server** on ``tty5`` and also make is so that it starts
 automatically at boot.
