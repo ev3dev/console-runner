@@ -39,7 +39,7 @@ const string extra_parameters = "[--] <command> [<args>...]";
 const string summary = "Runs a command remotely via console-runner-server.";
 const string description = "Note: If <args>... contains any command line options starting with '-', then it is necessary to use '--'.";
 
-[DBus (name = "org.ev3dev.grx.ConsoleRunner")]
+[DBus (name = "org.ev3dev.ConsoleRunner")]
 interface ConsoleRunner : Object {
     public abstract void start (string[] args, HashTable<string, string> env, string cwd,
         bool pipe_stdin, UnixInputStream stdin_stream,

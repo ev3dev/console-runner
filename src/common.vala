@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const string console_runner_server_bus_name = "org.ev3dev.grx.ConsoleRunner";
-const string console_runner_server_object_path = "/org/ev3dev/grx/console_runner/server";
+const string console_runner_server_bus_name = "org.ev3dev.ConsoleRunner";
+const string console_runner_server_object_path = "/org/ev3dev/ConsoleRunner/Server";
 
-[DBus (name = "org.ev3dev.grx.ConsoleRunner.Error")]
+[DBus (name = "org.ev3dev.ConsoleRunner.Error")]
 public errordomain ConsoleRunnerError
 {
     FAILED,

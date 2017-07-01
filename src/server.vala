@@ -20,7 +20,7 @@
 using Linux;
 using Linux.VirtualTerminal;
 
-[DBus (name = "org.ev3dev.grx.ConsoleRunner")]
+[DBus (name = "org.ev3dev.ConsoleRunner")]
 public class ConsoleRunnerServer : Object {
     SubprocessLauncher launcher = new SubprocessLauncher (SubprocessFlags.NONE);
     Subprocess? proc;

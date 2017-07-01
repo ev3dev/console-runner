@@ -97,13 +97,13 @@ Here is an example::
 
     <busconfig>
         <policy user="myname">
-            <allow own="org.ev3dev.grx.ConsoleRunner"/>
+            <allow own="org.ev3dev.ConsoleRunner"/>
             <allow send_type="method_call" log="true"/>
         </policy>                 
     </busconfig>
 
 Replace ``myname`` with your user name and save the file as
-``/etc/dbus-1/system.d/org.ev3dev.grx.ConsoleRunner.conf``. Then you will be
+``/etc/dbus-1/system.d/org.ev3dev.ConsoleRunner.conf``. Then you will be
 able to use **console-runner** with your user account.
 
 
