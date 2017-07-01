@@ -7,7 +7,7 @@ D-Bus client/server for running programs on a remote virtual console.
 Documentation
 -------------
 
-* [Online](doc/)
+* [Online](doc/console-runner.rst)
 * `man console-runner`
 
 
