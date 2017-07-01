@@ -92,14 +92,14 @@ configuration file to give users permission to use **console-runner**.
 Here is an example::
 
     <!DOCTYPE busconfig PUBLIC
-    "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
-    "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+        "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+        "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
 
     <busconfig>
         <policy user="myname">
             <allow own="org.ev3dev.ConsoleRunner"/>
             <allow send_type="method_call" log="true"/>
-        </policy>                 
+        </policy>
     </busconfig>
 
 Replace ``myname`` with your user name and save the file as
