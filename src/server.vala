@@ -22,7 +22,6 @@ using Linux.VirtualTerminal;
 
 [DBus (name = "org.ev3dev.ConsoleRunner")]
 public class ConsoleRunnerServer : Object {
-    SubprocessLauncher launcher = new SubprocessLauncher (SubprocessFlags.NONE);
     Subprocess? proc;
 
     public string? tty_name { construct; get; }
@@ -59,6 +58,8 @@ public class ConsoleRunnerServer : Object {
             throw new ConsoleRunnerError.INVALID_ARGUMENT ("first arg cannot be empty");
         }
         try {
+            var launcher = new SubprocessLauncher (SubprocessFlags.NONE);
+
             // clear the environment
             set_environ (launcher, new string[0]);
             // set the passed environment
@@ -70,57 +71,20 @@ public class ConsoleRunnerServer : Object {
             launcher.set_cwd (cwd);
 
             // setup pipes
-            var flags = SubprocessFlags.NONE;
             if (pipe_stdin) {
-                flags |= SubprocessFlags.STDIN_PIPE;
-            } else {
-                flags |= SubprocessFlags.STDIN_INHERIT;
+                launcher.take_stdin_fd (stdin_stream.get_fd ());
+            }
+            else {
+                launcher.set_flags (SubprocessFlags.STDIN_INHERIT);
             }
             if (pipe_stdout) {
-                flags |= SubprocessFlags.STDOUT_PIPE;
+                launcher.take_stdout_fd (stdout_stream.get_fd ());
             }
             if (pipe_stderr) {
-                flags |= SubprocessFlags.STDERR_PIPE;
+                launcher.take_stderr_fd (stderr_stream.get_fd ());
             }
-            launcher.set_flags (flags);
 
             proc = launcher.spawnv (args);
-
-            if (pipe_stdin) {
-                proc.get_stdin_pipe ().splice_async.begin (stdin_stream, OutputStreamSpliceFlags.CLOSE_TARGET,
-                    Priority.DEFAULT, null, (o, r) => {
-                        try {
-                            proc.get_stdin_pipe ().splice_async.end (r);
-                        }
-                        catch (IOError e) {
-                            stderr.printf ("stdin pipe error: %s\n", e.message);
-                        }
-                    });
-            }
-
-            if (pipe_stdout) {
-                stdout_stream.splice_async.begin (proc.get_stdout_pipe (), OutputStreamSpliceFlags.NONE,
-                    Priority.DEFAULT, null, (o, r) => {
-                        try {
-                            stdout_stream.splice_async.end (r);
-                        }
-                        catch (IOError e) {
-                            stderr.printf ("stdout pipe error: %s\n", e.message);
-                        }
-                    });
-            }
-
-            if (pipe_stderr) {
-                stderr_stream.splice_async.begin (proc.get_stderr_pipe (), OutputStreamSpliceFlags.NONE,
-                    Priority.DEFAULT, null, (o, r) => {
-                        try {
-                            stderr_stream.splice_async.end (r);
-                        }
-                        catch (IOError e) {
-                            stderr.printf ("stderr pipe error: %s\n", e.message);
-                        }
-                    });
-            }
 
             // try to activate the VT where the server is running
             var old_vt_num = 0;
