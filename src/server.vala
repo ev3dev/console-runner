@@ -18,11 +18,15 @@
  */
 
 using Linux;
+using Linux.Console;
 using Linux.VirtualTerminal;
 
 [DBus (name = "org.ev3dev.ConsoleRunner")]
 public class ConsoleRunnerServer : Object {
     Subprocess? proc;
+    Mode vt_mode;
+    int kbd_mode;
+    Posix.termios termios;
 
     public string? tty_name { construct; get; }
     public int vt_num { construct; get; }
@@ -32,6 +36,10 @@ public class ConsoleRunnerServer : Object {
         int n;
         tty_name.scanf ("/dev/tty%d", out n);
         vt_num = n;
+        // save original state for later
+        ioctl (stdin.fileno (), VT_GETMODE, out vt_mode);
+        ioctl (stdin.fileno (), KDGKBMODE, out kbd_mode);
+        Posix.tcgetattr (stdin.fileno (), out termios);
     }
 
     // work around broken vapi
@@ -113,6 +121,13 @@ public class ConsoleRunnerServer : Object {
             }
 
             proc.wait_async.begin (null, (o, r) => {
+                // make sure the process does not leave us stuck in graphics
+                // mode or without keyboard input
+                ioctl (stdin.fileno (), KDSETMODE, TerminalMode.TEXT);
+                ioctl (stdin.fileno (), VT_SETMODE, vt_mode);
+                ioctl (stdin.fileno (), KDSKBMODE, kbd_mode);
+                Posix.tcsetattr (stdin.fileno (), Posix.TCSAFLUSH, termios);
+
                 // if this is the active VT, try to restore the old VT
                 if (old_vt_num > 0) {
                     VirtualTerminal.Stat vt_stat;
