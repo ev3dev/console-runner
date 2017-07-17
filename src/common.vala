@@ -20,6 +20,18 @@
 const string console_runner_server_bus_name = "org.ev3dev.ConsoleRunner";
 const string console_runner_server_object_path = "/org/ev3dev/ConsoleRunner/Server";
 
+[DBus (name = "org.ev3dev.ConsoleRunner")]
+public interface ConsoleRunner : Object {
+    public abstract void start (string[] args, HashTable<string, string> env, string cwd,
+        bool pipe_stdin, UnixInputStream stdin_stream,
+        bool pipe_stdout, UnixOutputStream stdout_stream,
+        bool pipe_stderr, UnixOutputStream stderr_stream) throws DBusError, ConsoleRunnerError;
+    public abstract void signal (int sig) throws DBusError, ConsoleRunnerError;
+    public signal void exited (int code);
+    public signal void signaled (int code);
+    public signal void errored (string msg);
+}
+
 [DBus (name = "org.ev3dev.ConsoleRunner.Error")]
 public errordomain ConsoleRunnerError
 {

@@ -39,18 +39,6 @@ const string extra_parameters = "[--] <command> [<args>...]";
 const string summary = "Runs a command remotely via console-runner-server.";
 const string description = "Note: If <args>... contains any command line options starting with '-', then it is necessary to use '--'.";
 
-[DBus (name = "org.ev3dev.ConsoleRunner")]
-interface ConsoleRunner : Object {
-    public abstract void start (string[] args, HashTable<string, string> env, string cwd,
-        bool pipe_stdin, UnixInputStream stdin_stream,
-        bool pipe_stdout, UnixOutputStream stdout_stream,
-        bool pipe_stderr, UnixOutputStream stderr_stream) throws DBusError, ConsoleRunnerError;
-    public abstract void signal (int sig) throws DBusError, ConsoleRunnerError;
-    public signal void exited (int code);
-    public signal void signaled (int code);
-    public signal void errored (string msg);
-}
-
 static bool on_unix_signal (int sig) {
     // signals are passed to the remote process
     try {

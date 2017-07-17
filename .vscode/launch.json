@@ -20,8 +20,7 @@
                     "ignoreFailures": true
                 }
             ]
-        },
-        {
+        }, {
             "name": "(gdb) Launch Client",
             "type": "cppdbg",
             "request": "launch",
@@ -30,6 +29,25 @@
             "args": ["echo", "testing"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}/build/src/client",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }, {
+            "name": "(gdb) Launch Kill",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/build/src/conrun-kill",
+            "args": ["--signal=x"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/build/src/kill",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",

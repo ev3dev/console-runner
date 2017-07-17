@@ -19,6 +19,8 @@ SYNOPSIS
 
 **conrun** [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
 
+**conrun-kill** [**--signal=***signal*]
+
 
 DESCRIPTION
 ===========
@@ -71,6 +73,21 @@ OPTIONS
 **--**
     Separates *command* from other options. It is only needed when any *arg*
     contains flags starting with ``-``.
+
+
+**conrun-kill** options
+-----------------------
+
+**-s**, **--signal=***signal*
+    Specifies the signal to be sent. The signal can be a posix signal name
+    (with or without the "SIG" prefix) or the signal number. The default is
+    to use `SIGTERM` when this option is omitted.
+
+**-h**, **--help**
+    Print a help message and exit.
+
+**-v**, **--version**
+    Print the program version and exit.
 
 
 ENVIRONMENT

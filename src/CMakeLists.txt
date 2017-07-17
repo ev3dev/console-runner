@@ -37,6 +37,32 @@ target_link_libraries(${CLIENT_TARGET} ${CONSOLE_RUNNER_DEPS_LIBRARIES} ${SHARED
 install(TARGETS ${CLIENT_TARGET} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 
+# Kill
+
+vala2c(KILL_C_FILES
+    PACKAGES
+        gio-2.0
+        gio-unix-2.0
+        posix
+    TARGET_GLIB
+        2.48
+    OUTPUT_DIR
+        kill
+    SOURCE_FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/version.vala
+        common.vala
+        kill.vala
+)
+
+set(KILL_TARGET "conrun-kill")
+add_executable(${KILL_TARGET} ${KILL_C_FILES})
+target_compile_options(${KILL_TARGET} PRIVATE "-w")
+target_include_directories(${KILL_TARGET} PRIVATE ${CONSOLE_RUNNER_DEPS_INCLUDE_DIRS})
+target_link_libraries(${KILL_TARGET} ${CONSOLE_RUNNER_DEPS_LIBRARIES} ${SHARED_LIBRARY_TARGET})
+
+install(TARGETS ${KILL_TARGET} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+
 # Server
 
 vala2c(SERVER_C_FILES
