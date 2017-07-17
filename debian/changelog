@@ -1,3 +1,10 @@
+console-runner (1.2.0) testing; urgency=medium
+
+  * Restore text mode after process exits
+  * Add conrun-kill command
+
+ -- David Lechner <david@lechnology.com>  Sun, 16 Jul 2017 19:51:42 -0500
+
 console-runner (1.1.0) testing; urgency=medium
 
   * server: use file descriptors directly instead of splicing streams.
