@@ -94,7 +94,7 @@ ENVIRONMENT
 ===========
 
 **conrun** sends the current environment to **conrun-server** so that *command*
-executes using the environment of **connrun** rather than **connrun-server**.
+executes using the environment of **conrun** rather than **conrun-server**.
 This also includes the current working directory in addition to environment
 variables.
 
