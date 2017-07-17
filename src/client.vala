@@ -22,16 +22,16 @@ static ConsoleRunner client;
 static MainLoop loop;
 static string[] command;
 
-static bool version = false;
 static bool pipe_stdin = false;
 static bool pipe_stdout = false;
 static bool pipe_stderr = false;
+static bool version = false;
 
 const OptionEntry[] options = {
-    { "version", 'v', 0, OptionArg.NONE, ref version, "Display version number and exit", null },
     { "pipe-stdin", 'i', 0, OptionArg.NONE, ref pipe_stdin, "Pipe stdin from console-runner to the remote process", null },
     { "pipe-stdout", 'o', 0, OptionArg.NONE, ref pipe_stdout, "Pipe stdout from the remote process to console-runner", null },
     { "pipe-stderr", 'e', 0, OptionArg.NONE, ref pipe_stderr, "Pipe stderr from the remote process to console-runner", null },
+    { "version", 'v', 0, OptionArg.NONE, ref version, "Display version number and exit", null },
     { null }
 };
 
