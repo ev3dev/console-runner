@@ -3,7 +3,7 @@ console-runner
 ==============
 
 :Author: David Lechner
-:Date: June 2017
+:Date: August 2017
 
 
 NAME
@@ -17,7 +17,7 @@ SYNOPSIS
 
 **conrun-server**
 
-**conrun** [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
+**conrun** [**--directory=***dir*] [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
 
 **conrun-kill** [**--signal=***signal*]
 
@@ -51,6 +51,10 @@ OPTIONS
 
 *arg* ...
     Additional arguments for *command*.
+
+**-d**, **--directory=***dir*
+    Specifies the working directory for the remote command. When omitted, the
+    current working directory of the **conrun** command is used.
 
 **-i**, **--pipe-stdin**
     Pipe the standard input from **conrun** to *command*. When omitted, *command*

@@ -22,12 +22,14 @@ static ConsoleRunner client;
 static MainLoop loop;
 static string[] command;
 
+static string? directory = null;
 static bool pipe_stdin = false;
 static bool pipe_stdout = false;
 static bool pipe_stderr = false;
 static bool version = false;
 
 const OptionEntry[] options = {
+    { "directory" , 'd', 0, OptionArg.STRING, ref directory, "Specifies the working directory", "<dir>" },
     { "pipe-stdin", 'i', 0, OptionArg.NONE, ref pipe_stdin, "Pipe stdin from console-runner to the remote process", null },
     { "pipe-stdout", 'o', 0, OptionArg.NONE, ref pipe_stdout, "Pipe stdout from the remote process to console-runner", null },
     { "pipe-stderr", 'e', 0, OptionArg.NONE, ref pipe_stderr, "Pipe stderr from the remote process to console-runner", null },
@@ -91,14 +93,17 @@ static void on_bus_name_appeared (DBusConnection connection, string name, string
             env[v] = Environment.get_variable (v);
         }
 
+        // working directory
+        var cwd = directory ?? Environment.get_current_dir ();
+
         // handle pipes
         var stdin_stream = new UnixInputStream (stdin.fileno (), false);
         var stdout_stream = new UnixOutputStream (stdout.fileno (), false);
         var stderr_stream = new UnixOutputStream (stderr.fileno (), false);
 
         // finally, start the remote process
-        client.start (command, env, Environment.get_current_dir (),
-            pipe_stdin, stdin_stream, pipe_stdout, stdout_stream, pipe_stderr, stderr_stream);
+        client.start (command, env, cwd, pipe_stdin, stdin_stream,
+            pipe_stdout, stdout_stream, pipe_stderr, stderr_stream);
     }
     catch (Error e) {
         if (e is DBusError.SERVICE_UNKNOWN) {
