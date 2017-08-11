@@ -139,7 +139,9 @@ and run **conrun-server** using your user account::
 
     [Service]
     Type=simple
+    ExecStartPre=+/bin/chown myname /dev/%i
     ExecStart=/usr/bin/conrun-server
+    ExecStopPost=+/bin/chown myname /dev/%i
     User=myname
     StandardInput=tty-fail
     StandardOutput=tty
