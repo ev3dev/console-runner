@@ -55,10 +55,6 @@ public class ConsoleRunnerServer : Object {
         Posix.write (Posix.STDIN_FILENO, "\033c", 3);
     }
 
-    // work around broken vapi
-    [CCode (cname = "g_subprocess_launcher_set_environ")]
-    static extern void set_environ (SubprocessLauncher launcher, [CCode (array_length = 1.1)]string[] env);
-
     public void start (string[] args, HashTable<string, string> env, string cwd,
             bool pipe_stdin, UnixInputStream stdin_stream,
             bool pipe_stdout, UnixOutputStream stdout_stream,
@@ -82,7 +78,7 @@ public class ConsoleRunnerServer : Object {
             var launcher = new SubprocessLauncher (SubprocessFlags.NONE);
 
             // clear the environment
-            set_environ (launcher, new string[0]);
+            Fixes.GLib.SubprocessLauncher.set_environ (launcher, new string[0]);
             // set the passed environment
             env.foreach ((k, v) => {
                 launcher.setenv (k, v, true);

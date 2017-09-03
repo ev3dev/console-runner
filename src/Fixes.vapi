@@ -24,3 +24,9 @@ namespace Fixes.GLib.IOError {
         return (global::GLib.IOError)err;
     }
 }
+
+namespace Fixes.GLib.SubprocessLauncher {
+    // this is fixed in vala 0.34
+    [CCode (cname = "g_subprocess_launcher_set_environ")]
+    public void set_environ (global::GLib.SubprocessLauncher launcher, [CCode (array_length = 1.1)]string[] env);
+}
