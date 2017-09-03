@@ -136,12 +136,14 @@ public class ConsoleRunnerServer : Object {
             }
 
             proc.wait_async.begin (null, (o, r) => {
-                // make sure the process does not leave us stuck in graphics
-                // mode or without keyboard input
-                ioctl (Posix.STDIN_FILENO, KDSETMODE, TerminalMode.TEXT);
-                ioctl (Posix.STDIN_FILENO, VT_SETMODE, vt_mode);
-                ioctl (Posix.STDIN_FILENO, KDSKBMODE, kbd_mode);
-                Posix.tcsetattr (Posix.STDIN_FILENO, Posix.TCSAFLUSH, termios);
+                if (vt_num > 0) {
+                    // make sure the process does not leave us stuck in graphics
+                    // mode or without keyboard input
+                    ioctl (Posix.STDIN_FILENO, KDSETMODE, TerminalMode.TEXT);
+                    ioctl (Posix.STDIN_FILENO, VT_SETMODE, vt_mode);
+                    ioctl (Posix.STDIN_FILENO, KDSKBMODE, kbd_mode);
+                    Posix.tcsetattr (Posix.STDIN_FILENO, Posix.TCSAFLUSH, termios);
+                }
 
                 // if this is the active VT, try to restore the old VT
                 if (old_vt_num > 0) {
