@@ -28,18 +28,26 @@ public class ConsoleRunnerServer : Object {
     int kbd_mode;
     Posix.termios termios;
 
-    public string? tty_name { construct; get; }
-    public int vt_num { construct; get; }
+    public string? tty_name { get; private set; }
+    public int vt_num { get; private set; }
 
-    construct {
-        tty_name = Posix.ttyname (stdin.fileno ());
+    public ConsoleRunnerServer() throws Error {
+        if (!Posix.isatty (Posix.STDIN_FILENO)) {
+            throw new IOError.FAILED ("Not a tty");
+        }
+        tty_name = Posix.ttyname (Posix.STDIN_FILENO);
+        if (tty_name == null) {
+            throw Fixes.GLib.IOError.from_errno (errno, "Failed to get tty name");
+        }
         int n;
-        tty_name.scanf ("/dev/tty%d", out n);
-        vt_num = n;
-        // save original state for later
-        ioctl (stdin.fileno (), VT_GETMODE, out vt_mode);
-        ioctl (stdin.fileno (), KDGKBMODE, out kbd_mode);
-        Posix.tcgetattr (stdin.fileno (), out termios);
+        var count = tty_name.scanf ("/dev/tty%d", out n);
+        if (count == 1) {
+            vt_num = n;
+            // save original state for later
+            ioctl (Posix.STDIN_FILENO, VT_GETMODE, out vt_mode);
+            ioctl (Posix.STDIN_FILENO, KDGKBMODE, out kbd_mode);
+            Posix.tcgetattr (Posix.STDIN_FILENO, out termios);
+        }
     }
 
     // work around broken vapi
@@ -98,22 +106,22 @@ public class ConsoleRunnerServer : Object {
             var old_vt_num = 0;
             if (vt_num > 0) {
                 VirtualTerminal.Stat vt_stat;
-                var ret = ioctl (stdin.fileno (), VT_GETSTATE, out vt_stat);
+                var ret = ioctl (Posix.STDIN_FILENO, VT_GETSTATE, out vt_stat);
                 if (ret == -1) {
                     warning ("Failed to get VT state: %s", strerror (errno));
                 } else {
                     old_vt_num = vt_stat.v_active;
                 }
-                ret = ioctl (stdin.fileno (), VT_ACTIVATE, vt_num);
+                ret = ioctl (Posix.STDIN_FILENO, VT_ACTIVATE, vt_num);
                 if (ret == -1) {
                     warning ("Failed to activate VT: %s", strerror (errno));
                 }
-                ret = ioctl (stdin.fileno (), VT_WAITACTIVE, vt_num);
+                ret = ioctl (Posix.STDIN_FILENO, VT_WAITACTIVE, vt_num);
                 if (ret == -1 && errno == Posix.EINTR) {
                     // this ioctl can be interrupted because if a console is
                     // in graphics mode, it uses signals to negotiate switching
                     // so retry once if intertupted
-                    ret = ioctl (stdin.fileno (), VT_WAITACTIVE, vt_num);
+                    ret = ioctl (Posix.STDIN_FILENO, VT_WAITACTIVE, vt_num);
                 }
                 if (ret == -1) {
                     warning ("Failed to wait for active VT: %s", strerror (errno));
@@ -123,19 +131,19 @@ public class ConsoleRunnerServer : Object {
             proc.wait_async.begin (null, (o, r) => {
                 // make sure the process does not leave us stuck in graphics
                 // mode or without keyboard input
-                ioctl (stdin.fileno (), KDSETMODE, TerminalMode.TEXT);
-                ioctl (stdin.fileno (), VT_SETMODE, vt_mode);
-                ioctl (stdin.fileno (), KDSKBMODE, kbd_mode);
-                Posix.tcsetattr (stdin.fileno (), Posix.TCSAFLUSH, termios);
+                ioctl (Posix.STDIN_FILENO, KDSETMODE, TerminalMode.TEXT);
+                ioctl (Posix.STDIN_FILENO, VT_SETMODE, vt_mode);
+                ioctl (Posix.STDIN_FILENO, KDSKBMODE, kbd_mode);
+                Posix.tcsetattr (Posix.STDIN_FILENO, Posix.TCSAFLUSH, termios);
 
                 // if this is the active VT, try to restore the old VT
                 if (old_vt_num > 0) {
                     VirtualTerminal.Stat vt_stat;
-                    var ret = ioctl (stdin.fileno (), VT_GETSTATE, out vt_stat);
+                    var ret = ioctl (Posix.STDIN_FILENO, VT_GETSTATE, out vt_stat);
                     if (ret == -1) {
                         warning ("Failed to get VT state: %s", strerror (errno));
                     } else if (vt_stat.v_active == vt_num) {
-                        ret = ioctl (stdin.fileno (), VT_ACTIVATE, old_vt_num);
+                        ret = ioctl (Posix.STDIN_FILENO, VT_ACTIVATE, old_vt_num);
                         if (ret == -1) {
                             warning ("Failed to activate old VT: %s", strerror (errno));
                         }
@@ -181,8 +189,9 @@ public class ConsoleRunnerServer : Object {
 
 static void on_bus_aquired (DBusConnection conn) {
     try {
-        conn.register_object (console_runner_server_object_path, new ConsoleRunnerServer ());
-    } catch (IOError e) {
+        conn.register_object (console_runner_server_object_path, server);
+    }
+    catch (IOError e) {
         stderr.printf ("Could not register server\n");
         Process.exit (1);
     }
@@ -193,12 +202,22 @@ static void on_name_lost (DBusConnection? conn, string name) {
     Process.exit (1);
 }
 
+static ConsoleRunnerServer server;
+
 static int main (string[] args) {
     Environment.set_prgname (Path.get_basename (args[0]));
 
     if (Posix.getuid () == 0) {
         stderr.printf ("Refusing to run as root\n");
         return 1;
+    }
+
+    try {
+        server = new ConsoleRunnerServer ();
+    }
+    catch (Error err) {
+        stderr.printf ("%s\n", err.message);
+        Process.exit (1);
     }
 
     Bus.own_name (BusType.SYSTEM, console_runner_server_bus_name, BusNameOwnerFlags.NONE,

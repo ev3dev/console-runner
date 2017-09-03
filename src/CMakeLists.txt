@@ -79,6 +79,8 @@ vala2c(SERVER_C_FILES
         ${CMAKE_CURRENT_BINARY_DIR}/version.vala
         common.vala
         server.vala
+    SOURCE_VAPIS
+        Fixes.vapi
 )
 
 set(SERVER_TARGET "conrun-server")
