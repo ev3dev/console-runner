@@ -50,6 +50,11 @@ public class ConsoleRunnerServer : Object {
         }
     }
 
+    void reset_tty () {
+        // escape sequence to reset the terminal
+        Posix.write (Posix.STDIN_FILENO, "\033c", 3);
+    }
+
     // work around broken vapi
     [CCode (cname = "g_subprocess_launcher_set_environ")]
     static extern void set_environ (SubprocessLauncher launcher, [CCode (array_length = 1.1)]string[] env);
@@ -99,6 +104,8 @@ public class ConsoleRunnerServer : Object {
             if (pipe_stderr) {
                 launcher.take_stderr_fd (stderr_stream.get_fd ());
             }
+
+            reset_tty ();
 
             proc = launcher.spawnv (args);
 
