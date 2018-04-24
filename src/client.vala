@@ -49,6 +49,9 @@ static bool on_unix_signal (int sig) {
     catch (ConsoleRunnerError e) {
         critical ("Failed to send signal: %s\n", e.message);
     }
+    catch (IOError e) {
+        critical ("IO error while sending signal: %s\n", e.message);
+    }
     catch (DBusError e) {
         if (e is DBusError.SERVICE_UNKNOWN) {
             stderr.printf ("lost connection to console-runner-service\n");

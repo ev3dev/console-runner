@@ -58,7 +58,7 @@ public class ConsoleRunnerServer : Object {
     public void start (string[] args, HashTable<string, string> env, string cwd,
             bool pipe_stdin, UnixInputStream stdin_stream,
             bool pipe_stdout, UnixOutputStream stdout_stream,
-            bool pipe_stderr, UnixOutputStream stderr_stream) throws ConsoleRunnerError {
+            bool pipe_stderr, UnixOutputStream stderr_stream) throws DBusError, IOError, ConsoleRunnerError {
         if (proc != null) {
             throw new ConsoleRunnerError.BUSY ("Process is running");
         }
@@ -178,7 +178,7 @@ public class ConsoleRunnerServer : Object {
         }
     }
 
-    public void signal (int sig) throws ConsoleRunnerError {
+    public void signal (int sig) throws DBusError, IOError, ConsoleRunnerError {
         if (proc == null) {
             throw new ConsoleRunnerError.FAILED ("Process is not running");
         }
