@@ -24,6 +24,7 @@ using Linux.VirtualTerminal;
 [DBus (name = "org.ev3dev.ConsoleRunner")]
 public class ConsoleRunnerServer : Object {
     Subprocess? proc;
+    Posix.pid_t proc_pgrp;
     Mode vt_mode;
     int kbd_mode;
     Posix.termios termios;
@@ -101,9 +102,23 @@ public class ConsoleRunnerServer : Object {
                 launcher.take_stderr_fd (stderr_stream.get_fd ());
             }
 
+            // put the child process in it's own process group
+            launcher.set_child_setup (() => {
+                // this runs in the child process (of fork()) before exec()
+                // we can't change the pgid later after exec()
+                var pid = Posix.getpid ();
+                var ret = Posix.setpgid (pid, pid);
+                if (ret == -1) {
+                    warning ("Failed to set process group: %s", Posix.strerror (Posix.errno));
+                }
+            });
+
             reset_tty ();
 
             proc = launcher.spawnv (args);
+
+            // the pid is the pgid (set in set_child_setup())
+            proc_pgrp = int.parse (proc.get_identifier ());
 
             // try to activate the VT where the server is running
             var old_vt_num = 0;
@@ -128,6 +143,17 @@ public class ConsoleRunnerServer : Object {
                 }
                 if (ret == -1) {
                     warning ("Failed to wait for active VT: %s", strerror (errno));
+                }
+            }
+
+            // also need to notify the controlling terminal that this new
+            // group is the foreground process group
+            if (proc_pgrp > 0) {
+                Posix.signal (Posix.SIGTTOU, Posix.SIG_IGN);
+                var ret = Posix.tcsetpgrp (Posix.STDIN_FILENO, proc_pgrp);
+                if (ret == -1) {
+                    warning ("Failed to set terminal foreground process group: %s",
+                        Posix.strerror (Posix.errno));
                 }
             }
 
@@ -171,6 +197,7 @@ public class ConsoleRunnerServer : Object {
                     errored (e.message);
                 }
                 proc = null;
+                proc_pgrp = 0;
             });
         }
         catch (Error e) {

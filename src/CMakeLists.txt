@@ -86,6 +86,8 @@ vala2c(SERVER_C_FILES
 set(SERVER_TARGET "conrun-server")
 add_executable(${SERVER_TARGET} ${SERVER_C_FILES})
 target_compile_options(${SERVER_TARGET} PRIVATE "-w")
+# workaround for sighandler_t in vala < 0.40
+target_compile_definitions(${SERVER_TARGET} PRIVATE "_GNU_SOURCE")
 target_include_directories(${SERVER_TARGET} PRIVATE ${CONSOLE_RUNNER_DEPS_INCLUDE_DIRS})
 target_link_libraries(${SERVER_TARGET} ${CONSOLE_RUNNER_DEPS_LIBRARIES})
 
