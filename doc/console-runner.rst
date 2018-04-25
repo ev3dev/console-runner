@@ -19,7 +19,7 @@ SYNOPSIS
 
 **conrun** [**--directory=***dir*] [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
 
-**conrun-kill** [**--signal=***signal*]
+**conrun-kill** [**--signal=***signal*] [**--group**]
 
 
 DESCRIPTION
