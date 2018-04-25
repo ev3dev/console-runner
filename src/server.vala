@@ -212,6 +212,13 @@ public class ConsoleRunnerServer : Object {
         proc.send_signal (sig);
     }
 
+    public void signal_group (int sig) throws DBusError, IOError, ConsoleRunnerError {
+        if (proc == null) {
+            throw new ConsoleRunnerError.FAILED ("Process is not running");
+        }
+        Posix.kill (-proc_pgrp, sig);
+    }
+
     public signal void exited (int code);
 
     public signal void signaled (int sig);

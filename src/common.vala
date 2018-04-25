@@ -27,6 +27,7 @@ public interface ConsoleRunner : Object {
         bool pipe_stdout, UnixOutputStream stdout_stream,
         bool pipe_stderr, UnixOutputStream stderr_stream) throws DBusError, IOError, ConsoleRunnerError;
     public abstract void signal (int sig) throws DBusError, IOError, ConsoleRunnerError;
+    public abstract void signal_group (int sig) throws DBusError, IOError, ConsoleRunnerError;
     public signal void exited (int code);
     public signal void signaled (int code);
     public signal void errored (string msg);
