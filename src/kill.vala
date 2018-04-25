@@ -23,10 +23,12 @@ static MainLoop loop;
 static KillSignal kill_signal;
 
 static string? signal_arg = null;
+static bool group = false;
 static bool version = false;
 
 const OptionEntry[] options = {
     { "signal", 's', 0, OptionArg.STRING, ref signal_arg, "The signal name or number (default=TERM)", "SIGNAL" },
+    { "group", 'g', 0, OptionArg.NONE, ref group, "Send the signal to the entire process group.", null },
     { "version", 'v', 0, OptionArg.NONE, ref version, "Display version number and exit", null },
     { null }
 };
@@ -73,7 +75,12 @@ static void on_bus_name_appeared (DBusConnection connection, string name, string
             console_runner_server_object_path,
             DBusProxyFlags.DO_NOT_AUTO_START);
 
-        client.signal (kill_signal);
+        if (group) {
+            client.signal_group (kill_signal);
+        }
+        else {
+            client.signal (kill_signal);
+        }
     }
     catch (Error e) {
         if (e is DBusError.SERVICE_UNKNOWN) {

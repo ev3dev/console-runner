@@ -87,6 +87,10 @@ OPTIONS
     (with or without the "SIG" prefix) or the signal number. The default is
     to use `SIGTERM` when this option is omitted.
 
+**-g**, **--group**
+    When set, the signal will be sent to all processes in the process group
+    of the running program instead of just the program itself.
+
 **-h**, **--help**
     Print a help message and exit.
 
