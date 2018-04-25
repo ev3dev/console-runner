@@ -5,11 +5,6 @@ console-runner
 :Author: David Lechner
 :Date: August 2017
 
-.. ugly hack to make this render correctly on GitHub
-.. |nospace| unicode:: U+0000
-    :trim:
-
-
 NAME
 ====
 
@@ -21,9 +16,9 @@ SYNOPSIS
 
 **conrun-server**
 
-**conrun** [**--directory=** |nospace| *dir*] [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
+**conrun** [**--directory=**\ *dir*] [**--pipe-stdin**] [**--pipe-stdout**] [**--pipe-stderr**] [**--**] *command* [*arg* ...]]
 
-**conrun-kill** [**--signal=** |nospace| *signal*] [**--group**]
+**conrun-kill** [**--signal=**\ *signal*] [**--group**]
 
 
 DESCRIPTION
@@ -56,7 +51,7 @@ OPTIONS
 *arg* ...
     Additional arguments for *command*.
 
-**-d**, **--directory=** |nospace| *dir*
+**-d**, **--directory=**\ *dir*
     Specifies the working directory for the remote command. When omitted, the
     current working directory of the **conrun** command is used.
 
@@ -86,7 +81,7 @@ OPTIONS
 **conrun-kill** options
 -----------------------
 
-**-s**, **--signal=** |nospace| *signal*
+**-s**, **--signal=**\ *signal*
     Specifies the signal to be sent. The signal can be a posix signal name
     (with or without the "SIG" prefix) or the signal number. The default is
     to use `SIGTERM` when this option is omitted.
