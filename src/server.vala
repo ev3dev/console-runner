@@ -123,7 +123,7 @@ public class ConsoleRunnerServer : Object {
                 if (ret == -1 && errno == Posix.EINTR) {
                     // this ioctl can be interrupted because if a console is
                     // in graphics mode, it uses signals to negotiate switching
-                    // so retry once if intertupted
+                    // so retry once if interrupted
                     ret = ioctl (Posix.STDIN_FILENO, VT_WAITACTIVE, vt_num);
                 }
                 if (ret == -1) {
