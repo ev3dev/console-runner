@@ -120,6 +120,17 @@ public class ConsoleRunnerServer : Object {
             // the pid is the pgid (set in set_child_setup())
             proc_pgrp = int.parse (proc.get_identifier ());
 
+            // need to notify the controlling terminal that this new
+            // group is the foreground process group
+            if (proc_pgrp > 0) {
+                Posix.signal (Posix.SIGTTOU, Posix.SIG_IGN);
+                var ret = Posix.tcsetpgrp (Posix.STDIN_FILENO, proc_pgrp);
+                if (ret == -1) {
+                    warning ("Failed to set terminal foreground process group: %s",
+                        Posix.strerror (Posix.errno));
+                }
+            }
+
             // try to activate the VT where the server is running
             var old_vt_num = 0;
             if (vt_num > 0) {
@@ -143,17 +154,6 @@ public class ConsoleRunnerServer : Object {
                 }
                 if (ret == -1) {
                     warning ("Failed to wait for active VT: %s", strerror (errno));
-                }
-            }
-
-            // also need to notify the controlling terminal that this new
-            // group is the foreground process group
-            if (proc_pgrp > 0) {
-                Posix.signal (Posix.SIGTTOU, Posix.SIG_IGN);
-                var ret = Posix.tcsetpgrp (Posix.STDIN_FILENO, proc_pgrp);
-                if (ret == -1) {
-                    warning ("Failed to set terminal foreground process group: %s",
-                        Posix.strerror (Posix.errno));
                 }
             }
 
