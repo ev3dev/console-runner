@@ -1,3 +1,9 @@
+console-runner (1.4.1) stable; urgency=medium
+
+  * Improve race condition of setting the controlling terminal
+
+ -- David Lechner <david@lechnology.com>  Wed, 28 Nov 2018 13:38:45 -0600
+
 console-runner (1.4.0) stable; urgency=medium
 
   * run child process in new process group
