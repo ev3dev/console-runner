@@ -28,6 +28,7 @@ public class ConsoleRunnerServer : Object {
     Mode vt_mode;
     int kbd_mode;
     Posix.termios termios;
+    Posix.termios pipe_termios;
 
     public string? tty_name { get; private set; }
     public int vt_num { get; private set; }
@@ -91,6 +92,7 @@ public class ConsoleRunnerServer : Object {
             // setup pipes
             if (pipe_stdin) {
                 launcher.take_stdin_fd (stdin_stream.get_fd ());
+                Posix.tcgetattr (stdin_stream.get_fd (), out pipe_termios);
             }
             else {
                 launcher.set_flags (SubprocessFlags.STDIN_INHERIT);
@@ -179,6 +181,12 @@ public class ConsoleRunnerServer : Object {
                             warning ("Failed to activate old VT: %s", strerror (errno));
                         }
                     }
+                }
+
+                // If stdin was redirected and the child process crashed or was
+                // killed the client terminal could be in a bad state as well.
+                if (pipe_stdin) {
+                    Posix.tcsetattr (stdin_stream.get_fd (), Posix.TCSAFLUSH, pipe_termios);
                 }
 
                 try {
