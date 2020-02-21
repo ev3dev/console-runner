@@ -117,22 +117,6 @@ public class ConsoleRunnerServer : Object {
 
             reset_tty ();
 
-            proc = launcher.spawnv (args);
-
-            // the pid is the pgid (set in set_child_setup())
-            proc_pgrp = int.parse (proc.get_identifier ());
-
-            // need to notify the controlling terminal that this new
-            // group is the foreground process group
-            if (proc_pgrp > 0) {
-                Posix.signal (Posix.SIGTTOU, Posix.SIG_IGN);
-                var ret = Posix.tcsetpgrp (Posix.STDIN_FILENO, proc_pgrp);
-                if (ret == -1) {
-                    warning ("Failed to set terminal foreground process group: %s",
-                        Posix.strerror (Posix.errno));
-                }
-            }
-
             // try to activate the VT where the server is running
             var old_vt_num = 0;
             if (vt_num > 0) {
@@ -152,6 +136,39 @@ public class ConsoleRunnerServer : Object {
                 } while (ret == -1 && errno == Posix.EINTR);
                 if (ret == -1) {
                     warning ("Failed to wait for active VT: %s", strerror (errno));
+                }
+            }
+
+            try {
+                proc = launcher.spawnv (args);
+            } catch (Error err) {
+                // if this is the active VT, try to restore the old VT
+                if (old_vt_num > 0) {
+                    VirtualTerminal.Stat vt_stat;
+                    var ret = ioctl (Posix.STDIN_FILENO, VT_GETSTATE, out vt_stat);
+                    if (ret == -1) {
+                        warning ("Failed to get VT state: %s", strerror (errno));
+                    } else if (vt_stat.v_active == vt_num) {
+                        ret = ioctl (Posix.STDIN_FILENO, VT_ACTIVATE, old_vt_num);
+                        if (ret == -1) {
+                            warning ("Failed to activate old VT: %s", strerror (errno));
+                        }
+                    }
+                }
+                throw err;
+            }
+
+            // the pid is the pgid (set in set_child_setup())
+            proc_pgrp = int.parse (proc.get_identifier ());
+
+            // need to notify the controlling terminal that this new
+            // group is the foreground process group
+            if (proc_pgrp > 0) {
+                Posix.signal (Posix.SIGTTOU, Posix.SIG_IGN);
+                var ret = Posix.tcsetpgrp (Posix.STDIN_FILENO, proc_pgrp);
+                if (ret == -1) {
+                    warning ("Failed to set terminal foreground process group: %s",
+                        Posix.strerror (Posix.errno));
                 }
             }
 
