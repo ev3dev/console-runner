@@ -147,13 +147,9 @@ public class ConsoleRunnerServer : Object {
                 if (ret == -1) {
                     warning ("Failed to activate VT: %s", strerror (errno));
                 }
-                ret = ioctl (Posix.STDIN_FILENO, VT_WAITACTIVE, vt_num);
-                if (ret == -1 && errno == Posix.EINTR) {
-                    // this ioctl can be interrupted because if a console is
-                    // in graphics mode, it uses signals to negotiate switching
-                    // so retry once if interrupted
+                do {
                     ret = ioctl (Posix.STDIN_FILENO, VT_WAITACTIVE, vt_num);
-                }
+                } while (ret == -1 && errno == Posix.EINTR);
                 if (ret == -1) {
                     warning ("Failed to wait for active VT: %s", strerror (errno));
                 }
